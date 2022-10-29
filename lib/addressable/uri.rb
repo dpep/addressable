@@ -117,7 +117,7 @@ module Addressable
         uri = uri.to_str
       rescue TypeError, NoMethodError
         raise TypeError, "Can't convert #{uri.class} into String."
-      end if not uri.is_a? String
+      end unless uri.is_a?(String)
 
       # This Regexp supplied as an example in RFC 3986, and it works great.
       scan = uri.scan(URIREGEX)
@@ -144,9 +144,7 @@ module Addressable
           /:([^:@\[\]]*?)$/, EMPTY_STR
         )
         port = authority[/:([^:@\[\]]*?)$/, 1]
-      end
-      if port == EMPTY_STR
-        port = nil
+        port = nil if port == EMPTY_STR
       end
 
       return new(
@@ -189,7 +187,7 @@ module Addressable
         uri = uri.to_s
       end
 
-      if !uri.respond_to?(:to_str)
+      unless uri.respond_to?(:to_str)
         raise TypeError, "Can't convert #{uri.class} into String."
       end
       # Otherwise, convert to a String
@@ -335,7 +333,7 @@ module Addressable
         uri.kind_of?(self) ? uri : self.parse(uri.to_str)
       end
       result = uri_objects.shift.dup
-      for uri in uri_objects
+      uri_objects.each do |uri|
         result.join!(uri)
       end
       return result
@@ -822,21 +820,21 @@ module Addressable
     #
     # @return [Addressable::URI] The constructed URI object.
     def initialize(options={})
-      if options.has_key?(:authority)
+      if options.key?(:authority)
         if (options.keys & [:userinfo, :user, :password, :host, :port]).any?
           raise ArgumentError,
             "Cannot specify both an authority and any of the components " +
             "within the authority."
         end
       end
-      if options.has_key?(:userinfo)
+      if options.key?(:userinfo)
         if (options.keys & [:user, :password]).any?
           raise ArgumentError,
             "Cannot specify both a userinfo and either the user or password."
         end
       end
 
-      self.defer_validation do
+      defer_validation do
         # Bunch of crazy logic required because of the composite components
         # like userinfo and authority.
         self.scheme = options[:scheme] if options[:scheme]
@@ -851,7 +849,8 @@ module Addressable
         self.query_values = options[:query_values] if options[:query_values]
         self.fragment = options[:fragment] if options[:fragment]
       end
-      self.to_s
+
+      to_s # run path validation
     end
 
     ##
@@ -879,7 +878,7 @@ module Addressable
     #
     # @return [String] The scheme component.
     def scheme
-      return defined?(@scheme) ? @scheme : nil
+      @scheme if defined?(@scheme)
     end
 
     ##
@@ -932,7 +931,7 @@ module Addressable
     #
     # @return [String] The user component.
     def user
-      return defined?(@user) ? @user : nil
+      @user if defined?(@user)
     end
 
     ##
@@ -989,7 +988,7 @@ module Addressable
     #
     # @return [String] The password component.
     def password
-      return defined?(@password) ? @password : nil
+      @password if defined?(@password)
     end
 
     ##
@@ -1117,7 +1116,7 @@ module Addressable
     #
     # @return [String] The host component.
     def host
-      return defined?(@host) ? @host : nil
+      @host if defined?(@host)
     end
 
     ##
